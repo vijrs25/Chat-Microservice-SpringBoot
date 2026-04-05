@@ -1,4 +1,4 @@
-package com.watsappclone.start.controller;
+package com.watsappclone.start.controller.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,8 +20,8 @@ public class SignupController {
 	}
 
 	@PostMapping("/signup")
-	public String handleSignup(String name, String email, String password) {
-		User user = new User(name, email, password);
+	public String handleSignup(String name, String email, String password, String phoneNumber) {
+		User user = new User(name, email, password, phoneNumber, null, null, null );
 		userRepository.save(user);
 		return "redirect:/signup";
 	}

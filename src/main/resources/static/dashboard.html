@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Dashboard</title>
+    	<link rel="stylesheet" href="./css/dashboard.css">
+</head>
+<body>
+
+    <div class="dashboard">
+
+        <!-- Sidebar -->
+        <aside class="chat-sidebar">
+            <div class="sidebar-header">
+                <h2>Chats</h2>
+                <div class="current-user">
+                    <p><strong><span id="username">User Name </span></strong></p>
+                    <p id="email">user@email.com</p>
+                    <p id="phone">9999999999</p>
+                </div>
+            </div>
+
+            <div class="sidebar-search">
+                <input type="text" placeholder="Search or start new chat">
+            </div>
+
+            <ul class="contact-list">
+                <li class="contact-item active">
+                    <div class="contact-avatar">V</div>
+                    <div class="contact-details">
+                        <p class="contact-name">Vijay</p>
+                        <p class="contact-last-message">Last message preview...</p>
+                    </div>
+                </li>
+
+                <li class="contact-item">
+                    <div class="contact-avatar">R</div>
+                    <div class="contact-details">
+                        <p class="contact-name">Rahul</p>
+                        <p class="contact-last-message">Hey bro, kya scene hai?</p>
+                    </div>
+                </li>
+
+                <li class="contact-item">
+                    <div class="contact-avatar">A</div>
+                    <div class="contact-details">
+                        <p class="contact-name">Aman</p>
+                        <p class="contact-last-message">Kal milte hain</p>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <div class="chat-header">
+                <div>
+                    <h3>Rahul</h3>
+                    <p>online</p>
+                </div>
+
+                <form action="logout" method="get">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+
+            <div class="chat-messages">
+                <div class="message-row received">
+                    <div class="message-bubble">
+                        Hello bhai
+                    </div>
+                </div>
+
+                <div class="message-row sent">
+                    <div class="message-bubble">
+                        Haan bro, bol
+                    </div>
+                </div>
+
+                <div class="message-row received">
+                    <div class="message-bubble">
+                        Chat app ka layout bana raha hoon
+                    </div>
+                </div>
+
+                <div class="message-row sent">
+                    <div class="message-bubble">
+                        Nice, ab backend connect karte hain
+                    </div>
+                </div>
+            </div>
+
+            <form class="chat-composer">
+                <input type="text" name="message" class="chat-input" placeholder="Type a message">
+                <button type="submit" class="send-btn">Send</button>
+            </form>
+        </main>
+
+    </div>
+
+</body>
+<script>
+fetch('/api/user')
+    .then(res => res.json())
+    .then(data => {
+        console.log(data)
+        alert
+        document.getElementById("username").innerText = data.name;
+        document.getElementById("email").innerText = data.email;
+        document.getElementById("phone").innerText = data.phoneNumber;
+        
+    });
+</script>
+</html>
