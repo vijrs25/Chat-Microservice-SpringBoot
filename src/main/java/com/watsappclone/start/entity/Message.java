@@ -13,14 +13,14 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "message")
 public class Message {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "conversationid")
-	private Conversation conversationid;
+	private Conversation conversation;
 
 	@ManyToOne
 	@JoinColumn(name = "senderid")
@@ -31,21 +31,34 @@ public class Message {
 	private String type;
 	private LocalDateTime sentat;
 
-	public Message(Conversation conversationid, User senderid, String text, String type, LocalDateTime sentat) {
+	public Message(Long id, Conversation conversationid, User senderid, String text, String type,
+			LocalDateTime sentat) {
 		super();
-		this.conversationid = conversationid;
+		this.id = id;
+		this.conversation = conversationid;
 		this.senderid = senderid;
 		this.text = text;
 		this.type = type;
 		this.sentat = sentat;
 	}
 
+	public Message() {
+	}
+
 	public Conversation getConversationid() {
-		return conversationid;
+		return conversation;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public void setConversationid(Conversation conversationid) {
-		this.conversationid = conversationid;
+		this.conversation = conversationid;
 	}
 
 	public User getSenderid() {

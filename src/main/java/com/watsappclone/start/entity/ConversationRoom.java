@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 public class ConversationRoom {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "conversationid")
@@ -33,12 +33,24 @@ public class ConversationRoom {
 		this.joinedate = joinedate;
 	}
 
+	public ConversationRoom() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public Conversation getConversationid() {
 		return conversationid;
 	}
 
 	public void setConversationid(Conversation conversationid) {
 		this.conversationid = conversationid;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public User getUserid() {

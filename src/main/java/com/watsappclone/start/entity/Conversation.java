@@ -13,17 +13,28 @@ import jakarta.persistence.Table;
 public class Conversation {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 	private String type;
 	private LocalDateTime createdAt;
 	
-	public Conversation(int id, String type, LocalDateTime createdAt) {
+	public Conversation(Long id, String type, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.type = type;
 		this.createdAt = createdAt;
 	}
 	
+	public Conversation() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getType() {
 		return type;
 	}

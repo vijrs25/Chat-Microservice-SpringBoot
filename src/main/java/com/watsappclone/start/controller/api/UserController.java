@@ -23,7 +23,7 @@ public class UserController {
 	@GetMapping("/me")
 	public User getUser(HttpSession session) {
 		Long userid = (Long) session.getAttribute("userid");
-
+		System.out.println("userid"+userid);
 		if (userid != 0) {
 			System.out.println("userid " + userid);
 			return userRepository.findById(userid).orElse(null);

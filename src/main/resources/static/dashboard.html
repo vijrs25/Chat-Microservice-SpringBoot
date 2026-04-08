@@ -6,7 +6,8 @@
     <title>Chat Dashboard</title>
     <link rel="stylesheet" href="./css/dashboard.css">
 </head>
-<body onload="jseases();">
+
+<body>
 
     <div class="dashboard">
 
@@ -43,33 +44,8 @@
                 </form>
             </div>
 
-            <div class="chat-messages">
-                <div class="message-row received">
-                    <div class="message-bubble">
-                        Hello bhai
-                    </div>
-                </div>
-
-                <div class="message-row sent">
-                    <div class="message-bubble">
-                        Haan bro, bol
-                    </div>
-                </div>
-
-                <div class="message-row received">
-                    <div class="message-bubble">
-                        Chat app ka layout bana raha hoon
-                    </div>
-                </div>
-
-                <div class="message-row sent">
-                    <div class="message-bubble">
-                        Nice, ab backend connect karte hain
-                    </div>
-                </div>
-            </div>
-
-            <form class="chat-composer">
+            <div class="chat-messages"></div>   
+            <form class="chat-composer" class="chat-form">
                 <input type="text" name="message" class="chat-input" placeholder="Type a message">
                 <button type="submit" class="send-btn">Send</button>
             </form>
@@ -81,14 +57,15 @@
 <script src="./js/loadUser.js"></script>
 <script>
     fetch('/api/me')
-    .then(res => res.json())
-    .then(data => {
-        console.log(data)
-        alert
-        document.getElementById("username").innerText = data.name;
-        document.getElementById("email").innerText = data.email;
-        document.getElementById("phone").innerText = data.phoneNumber;
-        
-    });
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            alert
+            document.getElementById("username").innerText = data.name;
+            document.getElementById("email").innerText = data.email;
+            document.getElementById("phone").innerText = data.phoneNumber;
+
+        });
 </script>
+
 </html>
