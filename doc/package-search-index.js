@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.watsappclone.start.controller"},{"l":"com.watsappclone.start.controller.page"},{"l":"com.watsappclone.start.entity"},{"l":"com.watsappclone.start.repository"}];updateSearchResults();
