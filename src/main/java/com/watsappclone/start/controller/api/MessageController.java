@@ -3,6 +3,7 @@ package com.watsappclone.start.controller.api;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.watsappclone.start.dto.MassageResponse;
 import com.watsappclone.start.dto.MessageRequest;
+import com.watsappclone.start.entity.User;
 import com.watsappclone.start.service.MassageService;
 
 import jakarta.servlet.http.HttpSession;
@@ -25,7 +27,8 @@ public class MessageController {
 	
 	@GetMapping("/conversation/{conversationId}")
    public List<MassageResponse> getMassage(@PathVariable("conversationId") Long conversationid, HttpSession session){
-		 Long currentUserId = (Long) session.getAttribute("userid");
+		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long currentUserId = currentUser.getId();
 		 System.out.println(conversationid);
 	        if (currentUserId == null) {
 	            throw new RuntimeException("User not logged in");

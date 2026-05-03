@@ -3,15 +3,37 @@ document.addEventListener("DOMContentLoaded", init);
 let selectedUserId = null;
 let currentConversationId = null;
 let currentUserId = null;
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
 
-function init() {
-  loadCurrentUser();
-  loadAllUsers();
+  return {
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + token,
+  };
+}
+
+function redirectToLoginIfUnauthorized(response) {
+  if (response.status === 401 || response.status === 403) {
+    localStorage.clear();
+    window.location.href = "/login.html";
+    return true;
+  }
+  return false;
+}
+
+async function init() {
+  await loadCurrentUser();
+  await loadAllUsers();
 }
 
 async function loadCurrentUser() {
   try {
-    const response = await fetch("/api/me");
+    const response = await fetch("/api/me", {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (redirectToLoginIfUnauthorized(response)) return;
 
     if (!response.ok) {
       throw new Error("Failed to fetch current user");
@@ -34,7 +56,12 @@ async function loadCurrentUser() {
 
 async function loadAllUsers() {
   try {
-    const response = await fetch("/api/users");
+    const response = await fetch("/api/users", {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (redirectToLoginIfUnauthorized(response)) return;
 
     if (!response.ok) {
       throw new Error("Failed to load users");
@@ -84,8 +111,12 @@ async function openChat(userId, userName) {
     document.querySelector(".chat-header h3").innerText = userName;
     document.querySelector(".chat-header p").innerText = "Loading chat...";
 
-    const response = await fetch(`/api/chats/open?otherUserId=${userId}`);
+    const response = await fetch(`/api/chats/open?otherUserId=${userId}`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
 
+    if (redirectToLoginIfUnauthorized(response)) return;
     if (!response.ok) {
       throw new Error("Failed to open chat");
     }
@@ -104,9 +135,12 @@ async function openChat(userId, userName) {
 
 async function loadMessages(conversationId) {
   try {
-    const response = await fetch(
-      `/api/messages/conversation/${conversationId}`,
-    );
+   const response = await fetch(`/api/messages/conversation/${conversationId}`, {
+  method: "GET",
+  headers: getAuthHeaders()
+});
+
+if (redirectToLoginIfUnauthorized(response)) return;
 
     if (!response.ok) {
       throw new Error("Failed to load messages");
@@ -119,8 +153,10 @@ async function loadMessages(conversationId) {
 
     messages.forEach((msg) => {
       const div = document.createElement("div");
-      console.log("msg sender id"+msg.senderId+ "cuurent user "+currentUserId)
-      
+      console.log(
+        "msg sender id" + msg.senderId + "cuurent user " + currentUserId,
+      );
+
       const isMine = msg.SenderId === currentUserId;
       div.className = isMine ? "message-row sent" : "message-row received";
       div.innerText = msg.massageText;
@@ -138,60 +174,90 @@ const form = document.querySelector(".chat-composer");
 const input = document.querySelector(".chat-input");
 
 form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const messageText = input.value.trim();
-    if (!messageText) return;
-    console.log("currentConversationId =", currentConversationId);
-    try {
-        const response = await fetch("/api/messages/send", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                conversationid: currentConversationId,
-                messagetext: messageText
-            })
-        });
+  const messageText = input.value.trim();
+  if (!messageText) return;
+  console.log("currentConversationId =", currentConversationId);
+  try {
+    const response = await fetch("/api/messages/send", {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        conversationid: currentConversationId,
+        messagetext: messageText,
+      }),
+    });
 
-        if (!response.ok) {
-            throw new Error("Failed to send message");
-        }
 
-        const savedMessage = await response.json();
+  if (redirectToLoginIfUnauthorized(response)) return;
 
-        appendMessage(savedMessage);
-
-        input.value = "";
-
-    } catch (error) {
-        console.error("Error sending message:", error);
+    if (!response.ok) {
+      throw new Error("Failed to send message");
     }
+
+    const savedMessage = await response.json();
+
+    appendMessage(savedMessage);
+
+    input.value = "";
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
 });
 
-async function appendMessage(savedMesage){
-const chatMessage = document.querySelector(".chat-messages");
+async function appendMessage(savedMesage) {
+  const chatMessage = document.querySelector(".chat-messages");
 
-const div = document.createElement("div");
- if(savedMesage.senderid == currentUserId){
-   div.classList.add("message-row", "sent");
- }else{
-  div.classList.add("message-row", "recieved");
- }
+  const div = document.createElement("div");
+  if (savedMesage.senderid == currentUserId) {
+    div.classList.add("message-row", "sent");
+  } else {
+    div.classList.add("message-row", "recieved");
+  }
 
-   div.innerHTML = `
+  div.innerHTML = `
         <div class="message-bubble sent">
             ${savedMesage.massageText}
         </div>
     `;
 
-    chatMessage.appendChild(div);
-    scrollToBottom();
+  chatMessage.appendChild(div);
+  scrollToBottom();
 }
 
 function scrollToBottom() {
-    const chatContainer = document.querySelector(".chat-messages");
+  const chatContainer = document.querySelector(".chat-messages");
 
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+async function loginUser() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  });
+
+  if (!response.ok) {
+    alert("Invalid email or password");
+    return;
+  }
+
+  const data = await response.json();
+
+  // yahi main JWT save hoga
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("userId", data.userId);
+  localStorage.setItem("name", data.name);
+
+  window.location.href = "/dashboard";
 }

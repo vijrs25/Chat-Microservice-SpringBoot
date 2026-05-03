@@ -55,17 +55,4 @@
 
 </body>
 <script src="./js/loadUser.js"></script>
-<script>
-    fetch('/api/me')
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
-            alert
-            document.getElementById("username").innerText = data.name;
-            document.getElementById("email").innerText = data.email;
-            document.getElementById("phone").innerText = data.phoneNumber;
-
-        });
-</script>
-
 </html>
