@@ -40,9 +40,8 @@ public class MessageController {
 	
 	@PostMapping("/send")
 	public MassageResponse saveMassage(@RequestBody MessageRequest request, HttpSession session){
-		Long currentUserId = (Long) session.getAttribute("userid");
-		 System.out.println("Cuurent UserId"+currentUserId);
-		 System.out.println("request"+ request.getMessagetext()+" "+request.getConversationid());
+		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long currentUserId = currentUser.getId();
 	        if (currentUserId == null) {
 	            throw new RuntimeException("User not logged in");
 	        }
