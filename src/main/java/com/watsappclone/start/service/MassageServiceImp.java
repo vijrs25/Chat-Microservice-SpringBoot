@@ -3,6 +3,8 @@ package com.watsappclone.start.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import com.watsappclone.start.repository.UserRepository;
 
 @Service
 public class MassageServiceImp implements MassageService {
+	private static final Logger logger = LoggerFactory.getLogger(MassageServiceImp.class);
 	
 	@Autowired
 	MassageRepository massageRepo;
@@ -33,6 +36,7 @@ public class MassageServiceImp implements MassageService {
 	    
 	@Override
 	public List<MassageResponse> getMessagesByConversationId(Long conversationId) {
+		logger.debug("Loading messages for conversationId={}", conversationId);
 		
 		return  massageRepo.findByConversation_IdOrderBySentatAsc(conversationId)
 				    .stream()
@@ -47,9 +51,7 @@ public class MassageServiceImp implements MassageService {
 
 	@Override
 		 public MassageResponse sendMessage(MessageRequest request, Long userId) {
-				
-		System.out.println("Conversation id"+request.getConversationid());
-		System.out.println("User id"+userId);
+		logger.info("Persisting message from userId={} to conversationId={}", userId, request.getConversationid());
 		        Conversation conversation = conversationRepository
 		                .findById(request.getConversationid())
 		                .orElseThrow(() -> new RuntimeException("Conversation not found"));
@@ -65,6 +67,7 @@ public class MassageServiceImp implements MassageService {
 		        message.setSentat(LocalDateTime.now());
 
 		        Message saved = messageRepository.save(message);
+		        logger.debug("Message saved with id={} for conversationId={}", saved.getId(), request.getConversationid());
 
 		        return new MassageResponse(
 		                saved.getId(),
