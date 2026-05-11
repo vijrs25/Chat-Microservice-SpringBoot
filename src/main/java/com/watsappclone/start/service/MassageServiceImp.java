@@ -22,10 +22,7 @@ public class MassageServiceImp implements MassageService {
 	private static final Logger logger = LoggerFactory.getLogger(MassageServiceImp.class);
 	
 	@Autowired
-	MassageRepository massageRepo;
-	
-	  @Autowired
-	    private MassageRepository messageRepository;
+	private MassageRepository massageRepo;
 
 	    @Autowired
 	    private ConversationRepository conversationRepository;
@@ -38,7 +35,7 @@ public class MassageServiceImp implements MassageService {
 	public List<MassageResponse> getMessagesByConversationId(Long conversationId) {
 		logger.debug("Loading messages for conversationId={}", conversationId);
 		
-		return  massageRepo.findByConversation_IdOrderBySentatAsc(conversationId)
+		return massageRepo.findByConversation_IdOrderBySentatAsc(conversationId)
 				    .stream()
 				    .map(m -> new MassageResponse(
 				    		m.getId(), 
@@ -50,8 +47,11 @@ public class MassageServiceImp implements MassageService {
 	}
 
 	@Override
-		 public MassageResponse sendMessage(MessageRequest request, Long userId) {
+			 public MassageResponse sendMessage(MessageRequest request, Long userId) {
 		logger.info("Persisting message from userId={} to conversationId={}", userId, request.getConversationid());
+			if (request.getMessagetext() == null || request.getMessagetext().trim().isEmpty()) {
+				throw new RuntimeException("Message text is required");
+			}
 		        Conversation conversation = conversationRepository
 		                .findById(request.getConversationid())
 		                .orElseThrow(() -> new RuntimeException("Conversation not found"));
@@ -63,10 +63,11 @@ public class MassageServiceImp implements MassageService {
 		        Message message = new Message();
 		        message.setConversationid(conversation);
 		        message.setSenderid(sender);
-		        message.setText(request.getMessagetext());
+		        message.setText(request.getMessagetext().trim());
+		        message.setType("TEXT");
 		        message.setSentat(LocalDateTime.now());
 
-		        Message saved = messageRepository.save(message);
+		        Message saved = massageRepo.save(message);
 		        logger.debug("Message saved with id={} for conversationId={}", saved.getId(), request.getConversationid());
 
 		        return new MassageResponse(

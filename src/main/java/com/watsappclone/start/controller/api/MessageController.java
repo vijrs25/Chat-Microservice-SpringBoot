@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,9 @@ public class MessageController {
 
 	@Autowired
 	MassageService massageService;
+
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
 	
 	@GetMapping("/conversation/{conversationId}")
    public List<MassageResponse> getMassage(@PathVariable("conversationId") Long conversationid, HttpSession session){
@@ -51,6 +55,8 @@ public class MessageController {
 	            throw new RuntimeException("User not logged in");
 	        }
 	        logger.info("User {} is sending a message to conversationId={}", currentUserId, request.getConversationid());
-	        return massageService.sendMessage(request, currentUserId);
+	        MassageResponse savedMessage = massageService.sendMessage(request, currentUserId);
+	        messagingTemplate.convertAndSend("/topic/conversation/" + request.getConversationid(), savedMessage);
+	        return savedMessage;
 	}
 }
