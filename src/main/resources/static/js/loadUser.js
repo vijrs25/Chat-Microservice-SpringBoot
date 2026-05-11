@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", init);
 let selectedUserId = null;
 let currentConversationId = null;
 let currentUserId = null;
+let stompClient = null;
+let activeSubscription = null;
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
 
@@ -23,7 +25,16 @@ function redirectToLoginIfUnauthorized(response) {
 
 async function init() {
   await loadCurrentUser();
+  connectWebSocket();
   await loadAllUsers();
+}
+
+function connectWebSocket() {
+  const socket = new SockJS("/ws-chat");
+  stompClient = Stomp.over(socket);
+  stompClient.connect({}, () => {
+    console.log("WebSocket connected");
+  });
 }
 
 async function loadCurrentUser() {
@@ -128,9 +139,26 @@ async function openChat(userId, userName) {
     document.querySelector(".chat-header p").innerText = "Chat opened";
 
     await loadMessages(currentConversationId);
+    subscribeConversation(currentConversationId);
   } catch (error) {
     console.error("Error opening chat:", error);
   }
+}
+
+function subscribeConversation(conversationId) {
+  if (!stompClient || !stompClient.connected) return;
+
+  if (activeSubscription) {
+    activeSubscription.unsubscribe();
+  }
+
+  activeSubscription = stompClient.subscribe(
+    `/topic/conversation/${conversationId}`,
+    (message) => {
+      const payload = JSON.parse(message.body);
+      appendMessage(payload);
+    },
+  );
 }
 
 async function loadMessages(conversationId) {
@@ -157,7 +185,7 @@ if (redirectToLoginIfUnauthorized(response)) return;
         "msg sender id" + msg.senderId + "cuurent user " + currentUserId,
       );
 
-      const isMine = msg.SenderId === currentUserId;
+      const isMine = msg.senderId === currentUserId;
       div.className = isMine ? "message-row sent" : "message-row received";
       div.innerText = msg.massageText;
 
@@ -210,10 +238,10 @@ async function appendMessage(savedMesage) {
   const chatMessage = document.querySelector(".chat-messages");
 
   const div = document.createElement("div");
-  if (savedMesage.senderid == currentUserId) {
+  if (savedMesage.senderId == currentUserId) {
     div.classList.add("message-row", "sent");
   } else {
-    div.classList.add("message-row", "recieved");
+    div.classList.add("message-row", "received");
   }
 
   div.innerHTML = `
