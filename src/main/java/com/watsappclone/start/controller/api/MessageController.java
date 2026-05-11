@@ -3,6 +3,7 @@ package com.watsappclone.start.controller.api;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,30 +23,40 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("api/messages")
 public class MessageController {
 
-	@Autowired
-	MassageService massageService;
-	
-	@GetMapping("/conversation/{conversationId}")
-   public List<MassageResponse> getMassage(@PathVariable("conversationId") Long conversationid, HttpSession session){
-		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Long currentUserId = currentUser.getId();
-		 System.out.println(conversationid);
-	        if (currentUserId == null) {
-	            throw new RuntimeException("User not logged in");
-	        }
-	        
-	        return massageService.getMessagesByConversationId(conversationid);
-	}
-	
-	
-	@PostMapping("/send")
-	public MassageResponse saveMassage(@RequestBody MessageRequest request, HttpSession session){
-		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Long currentUserId = currentUser.getId();
-	        if (currentUserId == null) {
-	            throw new RuntimeException("User not logged in");
-	        }
-	        
-	        return massageService.sendMessage(request, currentUserId);
-	}
+    @Autowired
+    MassageService massageService;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @GetMapping("/conversation/{conversationId}")
+    public List<MassageResponse> getMassage(@PathVariable("conversationId") Long conversationid, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = currentUser.getId();
+
+        if (currentUserId == null) {
+            throw new RuntimeException("User not logged in");
+        }
+
+        return massageService.getMessagesByConversationId(conversationid);
+    }
+
+    @PostMapping("/send")
+    public MassageResponse saveMassage(@RequestBody MessageRequest request, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = currentUser.getId();
+
+        if (currentUserId == null) {
+            throw new RuntimeException("User not logged in");
+        }
+
+        MassageResponse savedMessage = massageService.sendMessage(request, currentUserId);
+
+        messagingTemplate.convertAndSend(
+                "/topic/conversation/" + request.getConversationid(),
+                savedMessage
+        );
+
+        return savedMessage;
+    }
 }
