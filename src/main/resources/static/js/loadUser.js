@@ -234,11 +234,9 @@ form.addEventListener("submit", async function (e) {
       throw new Error("Failed to send message");
     }
 
-    const savedMessage = await response.json();
-
-    appendMessage(savedMessage);
-
-    input.value = "";
+   await response.json();
+   input.value = "";
+   
   } catch (error) {
     console.error("Error sending message:", error);
   }
