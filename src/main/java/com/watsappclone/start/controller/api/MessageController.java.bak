@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.watsappclone.start.dto.MassageResponse;
 import com.watsappclone.start.dto.MessageRequest;
@@ -28,41 +27,30 @@ public class MessageController {
 
 	@Autowired
 	MassageService massageService;
-
-	@Autowired
-	private SimpMessagingTemplate messagingTemplate;
-
+	
 	@GetMapping("/conversation/{conversationId}")
-	public List<MassageResponse> getMassage(@PathVariable("conversationId") Long conversationid, HttpSession session) {
+   public List<MassageResponse> getMassage(@PathVariable("conversationId") Long conversationid, HttpSession session){
 		logger.info("Fetching messages for conversationId={}", conversationid);
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Long currentUserId = currentUser.getId();
-		if (currentUserId == null) {
-			logger.warn("Unauthorized attempt to fetch messages for conversationId={}", conversationid);
-			throw new RuntimeException("User not logged in");
-		}
-		logger.debug("User {} requested messages for conversationId={}", currentUserId, conversationid);
-		return massageService.getMessagesByConversationId(conversationid);
+	        if (currentUserId == null) {
+	        	logger.warn("Unauthorized attempt to fetch messages for conversationId={}", conversationid);
+	            throw new RuntimeException("User not logged in");
+	        }
+	        logger.debug("User {} requested messages for conversationId={}", currentUserId, conversationid);
+	        return massageService.getMessagesByConversationId(conversationid);
 	}
-
+	
+	
 	@PostMapping("/send")
-	public MassageResponse saveMassage(@RequestBody MessageRequest request, HttpSession session) {
+	public MassageResponse saveMassage(@RequestBody MessageRequest request, HttpSession session){
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Long currentUserId = currentUser.getId();
-
-		if (currentUserId == null) {
-			logger.warn("Unauthorized attempt to send message to conversationId={}", request.getConversationid());
-			throw new RuntimeException("User not logged in");
-		}
-
-		logger.info("User {} is sending a message to conversationId={}", currentUserId, request.getConversationid());
-
-		MassageResponse savedMessage = massageService.sendMessage(request, currentUserId);
-
-		messagingTemplate.convertAndSend("/topic/conversation/" + request.getConversationid(), savedMessage);
-
-		logger.debug("Message broadcasted to /topic/conversation/{}", request.getConversationid());
-
-		return savedMessage;
+	        if (currentUserId == null) {
+	        	logger.warn("Unauthorized attempt to send message to conversationId={}", request.getConversationid());
+	            throw new RuntimeException("User not logged in");
+	        }
+	        logger.info("User {} is sending a message to conversationId={}", currentUserId, request.getConversationid());
+	        return massageService.sendMessage(request, currentUserId);
 	}
 }
