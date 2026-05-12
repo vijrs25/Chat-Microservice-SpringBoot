@@ -3,6 +3,7 @@ package com.watsappclone.start.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,9 +27,11 @@ public class Message {
 	@JoinColumn(name = "senderid")
 	private User senderid;
 
-	@JoinColumn(name = "messagetext")
+	@Column(name = "messagetext")
 	private String text;
+	@Column(name = "messagetype")
 	private String type;
+	@Column(name = "sentat")
 	private LocalDateTime sentat;
 
 	public Message(Long id, Conversation conversationid, User senderid, String text, String type,
