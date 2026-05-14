@@ -28,7 +28,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/",
+                        		"/",
                                 "/login",
                                 "/login.html",
                                 "/dashboard.html",
@@ -37,7 +37,8 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/api/auth/**"
+                                "/api/auth/**",
+                                "/ws-connect/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

@@ -3,6 +3,9 @@ package com.watsappclone.start.dto;
 public class MessageRequest {
    private Long conversationid;
    private String messagetext;
+
+public MessageRequest() {
+}
     
 public MessageRequest(Long conversationid, String messagetext) {
 	super();
