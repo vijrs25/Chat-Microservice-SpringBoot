@@ -195,9 +195,9 @@ if (redirectToLoginIfUnauthorized(response)) return;
         "msg sender id" + msg.senderId + "cuurent user " + currentUserId,
       );
 
-      const isMine = msg.senderId === currentUserId;
+      const isMine = (msg.senderId ?? msg.SenderId) == currentUserId;
       div.className = isMine ? "message-row sent" : "message-row received";
-      div.innerText = msg.massageText;
+      div.innerHTML = `<div class="message-bubble">${msg.massageText ?? ""}</div>`;
 
       chatBody.appendChild(div);
     });
@@ -246,7 +246,7 @@ async function appendMessage(savedMesage) {
   const chatMessage = document.querySelector(".chat-messages");
 
   const div = document.createElement("div");
-  if (savedMesage.senderId == currentUserId) {
+  if ((savedMesage.senderId ?? savedMesage.SenderId) == currentUserId) {
     div.classList.add("message-row", "sent");
   } else {
     div.classList.add("message-row", "recieved");
@@ -297,3 +297,5 @@ async function loginUser() {
 
   window.location.href = "/dashboard";
 }
+
+

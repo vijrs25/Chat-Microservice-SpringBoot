@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Dashboard</title>
     <link rel="stylesheet" href="./css/dashboard.css">
 </head>
@@ -15,10 +16,15 @@
         <aside class="chat-sidebar">
             <div class="sidebar-header">
                 <h2>Chats</h2>
-                <div class="current-user">
-                    <p><strong><span id="username">User Name </span></strong></p>
-                    <p id="email">user@email.com</p>
-                    <p id="phone">contact</p>
+
+                <div class="current-user-card">
+                    <div class="current-user-avatar" id="currentUserAvatar">U</div>
+
+                    <div class="current-user">
+                        <p><strong><span id="username">User Name</span></strong></p>
+                        <p id="email">user@email.com</p>
+                        <p id="phone">contact</p>
+                    </div>
                 </div>
             </div>
 
@@ -26,17 +32,19 @@
                 <input type="text" placeholder="Search or start new chat">
             </div>
 
-            <ul class="contact-list" id="contactlist">
-                <li class="contact-item active"></li>
-            </ul>
+            <ul class="contact-list" id="contactlist"></ul>
         </aside>
 
         <!-- Main Chat Area -->
         <main class="chat-main">
             <div class="chat-header">
-                <div>
-                    <h3>Rahul</h3>
-                    <p>online</p>
+                <div class="chat-header-user">
+                    <div class="chat-header-avatar" id="chatHeaderAvatar">?</div>
+
+                    <div>
+                        <h3>Select a chat</h3>
+                        <p>No chat opened</p>
+                    </div>
                 </div>
 
                 <form action="logout" method="get">
@@ -44,8 +52,13 @@
                 </form>
             </div>
 
-            <div class="chat-messages"></div>   
-            <form class="chat-composer" class="chat-form">
+            <div class="chat-messages">
+                <div class="empty-chat-state">
+                    Select a user from the left side to start chatting
+                </div>
+            </div>
+
+            <form class="chat-composer">
                 <input type="text" name="message" class="chat-input" placeholder="Type a message">
                 <button type="submit" class="send-btn">Send</button>
             </form>
@@ -53,9 +66,9 @@
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="./js/loadUser.js"></script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-<script src="./js/loadUser.js"></script>
-</html>
+
 </html>
